@@ -9,7 +9,7 @@ import lombok.Getter;
 public enum Authority {
     
     USER_READ ("user:read"),
-    USER_WHITE ("user:white");
+    USER_WRITE ("user:write");
 
     private final String authority;
 

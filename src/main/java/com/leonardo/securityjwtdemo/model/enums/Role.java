@@ -15,8 +15,17 @@ import lombok.Getter;
 
 public enum Role {
     
-    COMMOM (Sets.newHashSet(Authority.USER_READ)),
-    ADMIN (Sets.newHashSet(Authority.USER_READ, Authority.USER_WHITE));
+    COMMOM (
+		Sets.newHashSet(
+			Authority.USER_READ
+		)
+	),
+    ADMIN (
+		Sets.newHashSet(
+			Authority.USER_READ, 
+			Authority.USER_WRITE
+		)
+	);
 
     private final Set<Authority> authorities;
 

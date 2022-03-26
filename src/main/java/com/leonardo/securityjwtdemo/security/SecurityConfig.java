@@ -1,5 +1,7 @@
 package com.leonardo.securityjwtdemo.security;
 
+import com.leonardo.securityjwtdemo.model.enums.Authority;
+import com.leonardo.securityjwtdemo.model.enums.Role;
 import com.leonardo.securityjwtdemo.security.users.AppUserDetailsService;
 
 import org.springframework.context.annotation.Bean;
@@ -23,7 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         http.headers().frameOptions().disable();
         
         http.authorizeRequests()
-            .antMatchers("/h2-console/**").permitAll()
+            .antMatchers("/h2-console/**").hasRole(Role.ADMIN.name())
             .anyRequest().authenticated()
             
             .and()
