@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.leonardo.securityjwtdemo.model.User;
+import com.leonardo.securityjwtdemo.model.AppUser;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 
 public class AppUserDetails implements UserDetails{
 
-    private User user;
+    private AppUser user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

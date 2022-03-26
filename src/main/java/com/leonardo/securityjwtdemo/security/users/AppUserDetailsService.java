@@ -1,6 +1,6 @@
 package com.leonardo.securityjwtdemo.security.users;
 
-import com.leonardo.securityjwtdemo.model.User;
+import com.leonardo.securityjwtdemo.model.AppUser;
 import com.leonardo.securityjwtdemo.repositories.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class AppUserDetailsService implements UserDetailsService{
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = repository.findByUsername(username).orElse(null);
+        AppUser user = repository.findByUsername(username).orElse(null);
         return new AppUserDetails(user);
     }
     

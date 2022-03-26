@@ -3,7 +3,7 @@ package com.leonardo.securityjwtdemo;
 import java.util.Arrays;
 
 import com.google.common.collect.Sets;
-import com.leonardo.securityjwtdemo.model.User;
+import com.leonardo.securityjwtdemo.model.AppUser;
 import com.leonardo.securityjwtdemo.model.enums.Role;
 import com.leonardo.securityjwtdemo.repositories.UserRepository;
 
@@ -30,12 +30,10 @@ public class SecurityJwtDemoApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		
-		User leonardo = new User(null, "leonardo", passwordEncoder.encode("senha123"), Sets.newHashSet(Role.COMMOM));
-		User claudia = new User(null, "claudia", passwordEncoder.encode("123senha"), Sets.newHashSet(Role.COMMOM, Role.ADMIN));
+		AppUser leonardo = new AppUser(null, "leonardo", passwordEncoder.encode("senha123"), Sets.newHashSet(Role.COMMOM));
+		AppUser claudia = new AppUser(null, "claudia", passwordEncoder.encode("123senha"), Sets.newHashSet(Role.COMMOM, Role.ADMIN));
 
-		repository.saveAll(Arrays.asList(leonardo, claudia));
-		
+		repository.saveAll(Arrays.asList(leonardo, claudia));		
 	}
 
 }
