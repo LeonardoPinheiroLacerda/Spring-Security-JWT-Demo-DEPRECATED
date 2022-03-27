@@ -1,6 +1,9 @@
 package com.leonardo.securityjwtdemo.security;
 
+import javax.crypto.SecretKey;
+
 import com.leonardo.securityjwtdemo.model.enums.Role;
+import com.leonardo.securityjwtdemo.security.jwt.JwtConfig;
 import com.leonardo.securityjwtdemo.security.jwt.JwtTokenVerifier;
 import com.leonardo.securityjwtdemo.security.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 import com.leonardo.securityjwtdemo.security.users.AppUserDetailsService;
@@ -20,6 +23,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
+    private final JwtConfig jwtConfig;
+    private final SecretKey secretKey;
+
+    public SecurityConfig(JwtConfig jwtConfig,
+        SecretKey secretKey) {
+        
+        this.jwtConfig = jwtConfig;
+        this.secretKey = secretKey;
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -30,8 +43,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
             .and()
 
-            .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
-            .addFilterAfter(new JwtTokenVerifier(), JwtUsernameAndPasswordAuthenticationFilter.class)
+            .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
+            .addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey), JwtUsernameAndPasswordAuthenticationFilter.class)
             /*
             Permite acesso ao banco de dados H2
             Para uma aplicação de produção, deletar essa linha ou restringir para profiles de teste ou desenvolvimento
