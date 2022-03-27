@@ -15,7 +15,7 @@ import lombok.Getter;
 
 public enum Role {
     
-    COMMOM (
+    COMMON (
 		Sets.newHashSet(
 			Authority.USER_READ
 		)

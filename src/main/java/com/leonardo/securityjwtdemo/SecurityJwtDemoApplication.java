@@ -30,8 +30,8 @@ public class SecurityJwtDemoApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		AppUser leonardo = new AppUser(null, "leonardo", passwordEncoder.encode("senha123"), Sets.newHashSet(Role.COMMOM));
-		AppUser claudia = new AppUser(null, "claudia", passwordEncoder.encode("123senha"), Sets.newHashSet(Role.COMMOM, Role.ADMIN));
+		AppUser leonardo = new AppUser(null, "leonardo", passwordEncoder.encode("senha123"), Sets.newHashSet(Role.COMMON));
+		AppUser claudia = new AppUser(null, "claudia", passwordEncoder.encode("123senha"), Sets.newHashSet(Role.COMMON, Role.ADMIN));
 
 		repository.saveAll(Arrays.asList(leonardo, claudia));		
 	}

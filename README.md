@@ -9,12 +9,12 @@ Esta aplicação conta com um banco de dados em memória H2 para armazenamento t
 Usuário 01
 - username: leonardo
 - password: senha123
-- roles: COMMOM
+- roles: COMMON
 
 Usuário 02
 - username: claudia
 - password: 123senha
-- roles: COMMOM, ADMIN
+- roles: COMMON, ADMIN
 
 ###### Observação: As senhas são critografadas utilizando o BCryptPasswordEncoder.
 
