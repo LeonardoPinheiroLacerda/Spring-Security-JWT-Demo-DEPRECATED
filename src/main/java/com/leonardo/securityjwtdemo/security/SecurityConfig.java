@@ -1,14 +1,17 @@
 package com.leonardo.securityjwtdemo.security;
 
-import com.leonardo.securityjwtdemo.model.enums.Authority;
 import com.leonardo.securityjwtdemo.model.enums.Role;
+import com.leonardo.securityjwtdemo.security.jwt.JwtTokenVerifier;
+import com.leonardo.securityjwtdemo.security.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 import com.leonardo.securityjwtdemo.security.users.AppUserDetailsService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,19 +20,31 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
-
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
-        http.headers().frameOptions().disable();
-        
-        http.authorizeRequests()
-            .antMatchers("/h2-console/**").hasRole(Role.ADMIN.name())
-            .anyRequest().authenticated()
-            
+        http
+            .csrf().disable()
+
+            .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
             .and()
-            .httpBasic();
+
+            .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
+            .addFilterAfter(new JwtTokenVerifier(), JwtUsernameAndPasswordAuthenticationFilter.class)
+            /*
+            Permite acesso ao banco de dados H2
+            Para uma aplicação de produção, deletar essa linha ou restringir para profiles de teste ou desenvolvimento
+            */
+            // .headers().frameOptions().disable()
+            // .and()
+        
+            .authorizeRequests()
+            //.antMatchers("/h2-console/**").permitAll()
+            .antMatchers(HttpMethod.GET, "/ping").hasRole(Role.ADMIN.name())
+            .anyRequest()
+            .authenticated();
+
     }
     
     @Bean
@@ -42,6 +57,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         return new AppUserDetailsService();
     }
   
-    
-
 }
