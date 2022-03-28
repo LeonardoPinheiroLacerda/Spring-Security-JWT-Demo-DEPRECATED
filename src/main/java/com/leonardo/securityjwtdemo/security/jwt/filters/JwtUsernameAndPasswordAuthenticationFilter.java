@@ -1,8 +1,6 @@
-package com.leonardo.securityjwtdemo.security.jwt;
+package com.leonardo.securityjwtdemo.security.jwt.filters;
 
 import java.io.IOException;
-import java.sql.Date;
-import java.time.LocalDate;
 
 import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
@@ -11,6 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.leonardo.securityjwtdemo.security.jwt.JwtConfig;
+import com.leonardo.securityjwtdemo.security.jwt.JwtUtil;
+import com.leonardo.securityjwtdemo.security.users.AppUserCredentialsDTO;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,21 +19,22 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import io.jsonwebtoken.Jwts;
-
 public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JwtConfig jwtConfig;
+    private final JwtUtil jwtUtil;
     private final SecretKey secretKey;
 
 
     public JwtUsernameAndPasswordAuthenticationFilter(AuthenticationManager authenticationManager,
         JwtConfig jwtConfig,
+        JwtUtil jwtUtil,
         SecretKey secretKey) {
 
         this.authenticationManager = authenticationManager;
         this.jwtConfig = jwtConfig;
+        this.jwtUtil = jwtUtil;
         this.secretKey = secretKey;
     }
 
@@ -42,8 +44,8 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
         HttpServletResponse response) throws AuthenticationException {
 
         try {
-            CredentialsRequest authenticationRequest = new ObjectMapper()
-                    .readValue(request.getInputStream(), CredentialsRequest.class);
+            AppUserCredentialsDTO authenticationRequest = new ObjectMapper()
+                    .readValue(request.getInputStream(), AppUserCredentialsDTO.class);
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     authenticationRequest.getUsername(),
@@ -66,16 +68,17 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
         FilterChain chain,
         Authentication authResult) throws IOException, ServletException {
         
-        
-        String token = Jwts.builder()
-            .setSubject(authResult.getName())
-            .claim("authorities", authResult.getAuthorities())
-            .setIssuedAt(Date.valueOf(LocalDate.now()))
-            .setExpiration(Date.valueOf(LocalDate.now().plusDays(Integer.parseInt(jwtConfig.getTokenExpirationAfterDays()))))
-            .signWith(secretKey)
-            .compact();
+        String token = jwtUtil.generateToken(authResult, jwtConfig, secretKey);
         
         response.addHeader("Authorization", jwtConfig.getTokenPrefix() + token);
     }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+            AuthenticationException failed) throws IOException, ServletException {
+        response.setStatus(401);
+    }
+
+    
 
 }

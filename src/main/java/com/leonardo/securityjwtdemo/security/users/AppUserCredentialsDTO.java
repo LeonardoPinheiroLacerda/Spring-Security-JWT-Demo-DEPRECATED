@@ -1,4 +1,4 @@
-package com.leonardo.securityjwtdemo.security.jwt;
+package com.leonardo.securityjwtdemo.security.users;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 
-public class CredentialsRequest {
+public class AppUserCredentialsDTO {
     
     private String username;
     private String password;

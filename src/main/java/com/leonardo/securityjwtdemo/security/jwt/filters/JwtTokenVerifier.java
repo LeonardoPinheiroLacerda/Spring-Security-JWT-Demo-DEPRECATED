@@ -1,4 +1,4 @@
-package com.leonardo.securityjwtdemo.security.jwt;
+package com.leonardo.securityjwtdemo.security.jwt.filters;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.common.base.Strings;
+import com.leonardo.securityjwtdemo.security.jwt.JwtConfig;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

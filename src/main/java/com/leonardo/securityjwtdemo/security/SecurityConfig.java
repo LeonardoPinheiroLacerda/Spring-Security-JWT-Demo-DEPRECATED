@@ -4,8 +4,9 @@ import javax.crypto.SecretKey;
 
 import com.leonardo.securityjwtdemo.model.enums.Role;
 import com.leonardo.securityjwtdemo.security.jwt.JwtConfig;
-import com.leonardo.securityjwtdemo.security.jwt.JwtTokenVerifier;
-import com.leonardo.securityjwtdemo.security.jwt.JwtUsernameAndPasswordAuthenticationFilter;
+import com.leonardo.securityjwtdemo.security.jwt.JwtUtil;
+import com.leonardo.securityjwtdemo.security.jwt.filters.JwtTokenVerifier;
+import com.leonardo.securityjwtdemo.security.jwt.filters.JwtUsernameAndPasswordAuthenticationFilter;
 import com.leonardo.securityjwtdemo.security.users.AppUserDetailsService;
 
 import org.springframework.context.annotation.Bean;
@@ -24,13 +25,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
     private final JwtConfig jwtConfig;
+    private final JwtUtil jwtUtil;
     private final SecretKey secretKey;
 
     public SecurityConfig(JwtConfig jwtConfig,
-        SecretKey secretKey) {
+        SecretKey secretKey,
+        JwtUtil jwtUtil) {
         
         this.jwtConfig = jwtConfig;
         this.secretKey = secretKey;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -43,7 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
             .and()
 
-            .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
+            .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig, jwtUtil, secretKey))
             .addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey), JwtUsernameAndPasswordAuthenticationFilter.class)
             /*
             Permite acesso ao banco de dados H2
