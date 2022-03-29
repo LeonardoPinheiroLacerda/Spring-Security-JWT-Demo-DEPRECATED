@@ -32,6 +32,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 
+//Classe responsável por válidar o token enviado pelo usuário afim de acessar os recursos da aplicação
 public class TokenVerifier extends OncePerRequestFilter {
    
     private final JwtConfig jwtConfig;
@@ -44,51 +45,74 @@ public class TokenVerifier extends OncePerRequestFilter {
         FilterChain filterChain
     ) throws ServletException, IOException {
         
+        //Salva o header de autorização em uma variavel
         String authorizationHeader = request.getHeader(jwtConfig.getAuthorizationHeaderName());
         
+        //Verifica se o header de autorização está preenchido e se o prefixo está correto.
         if(Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith(jwtConfig.getTokenPrefix())){
             filterChain.doFilter(request, response);
             return;
         }
 
+        //Remove o prefixo mantendo apenas o token
         String token = authorizationHeader.replace(jwtConfig.getTokenPrefix() , "");
         
         try{
+            //Recebe o corpo do token JWS
+            Claims body = getClaims(token).getBody();
 
-            Jws<Claims> claimsJws = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token);
+            //Convente os dados do JWS em um objeto do tipo Authentication
+            Authentication authentication = checkAuthenticationFromJwsBody(body);
 
-            Claims body = claimsJws.getBody();
-
-            String username = body.getSubject();
-
-            @SuppressWarnings("unchecked")
-            List<Map<String, String>> authorities = (List<Map<String, String>>)  body.get("authorities");
-
-            Set<SimpleGrantedAuthority> simpleGrantedAuthorities = authorities
-                .stream()
-                .map(m -> new SimpleGrantedAuthority(m.get("authority")))
-                .collect(Collectors.toSet());
-
-            
-            AppUserDetails userDetails = (AppUserDetails) userDetailsService.loadUserByUsername(username);
-            AppUser user = userDetails.getUser();
-
-            Authentication authentication = new UsernamePasswordAuthenticationToken(
-                user, 
-                user.getPassword(),
-                simpleGrantedAuthorities
-            );
-
+            //Insere o objeto de autenticação no contexto de segurança do Spring
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
+            //Da continuidade ao processo de autorização
             filterChain.doFilter(request, response);
-
         }catch(JwtException e){
+            //Exceção lançada ao receber um JWS inválido.
+            //Observação: Como se trata de uma aplicação com fins de demonstração, essa exceção não é tratada,
+            //logo a requisição que alcançar esse ponto receberá código 500 como resposta. Aconselho tratar essa exceção para retornar um código 401
             throw new IllegalStateException("Token " + token + " cannot be trusted");
         }
     }
     
+
+    protected Jws<Claims> getClaims(String token){
+        //Extrai o body do token
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token);
+    }
+
+    protected Authentication checkAuthenticationFromJwsBody(Claims body){
+
+        //Recebe o username presente no atributo subject
+        String username = body.getSubject();
+
+        //Recebe as autoridades do usuário e os salva em uma lista
+        @SuppressWarnings("unchecked")
+        List<Map<String, String>> authorities = (List<Map<String, String>>) body.get("authorities");
+
+        //Converte a lista de autoridades para um conjunto de SimpleGrantedAuthorities.
+        Set<SimpleGrantedAuthority> simpleGrantedAuthorities = authorities
+            .stream()
+            .map(m -> new SimpleGrantedAuthority(m.get("authority")))
+            .collect(Collectors.toSet());
+
+        
+        //Com base no username presente no JWS, o sistema busca o usuário correspondente no banco de dados.
+        AppUserDetails userDetails = (AppUserDetails) userDetailsService.loadUserByUsername(username);
+        AppUser user = userDetails.getUser();
+
+        //Constrói o objeto de autenticação com os dados extraídos a cima
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+            user, 
+            user.getPassword(),
+            simpleGrantedAuthorities
+        );
+
+        return authentication;
+    }
 }

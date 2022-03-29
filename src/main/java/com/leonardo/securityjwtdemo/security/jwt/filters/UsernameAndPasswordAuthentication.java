@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 
+//Classe responsável por gerar o token de autorização para os usuário no endpoint /login
 public class UsernameAndPasswordAuthentication extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
@@ -36,13 +37,17 @@ public class UsernameAndPasswordAuthentication extends UsernamePasswordAuthentic
         HttpServletResponse response) throws AuthenticationException {
 
         try {
+
+            //Converte o body enviado pela requisição para um objeto do tipo AppUserCredentialsDTO
             AppUserCredentialsDTO authenticationRequest = new ObjectMapper()
                     .readValue(request.getInputStream(), AppUserCredentialsDTO.class);
 
+            //Cria um objeto de autenticação com o nome de usuário e senha enviados pelo usuário
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     authenticationRequest.getUsername(),
                     authenticationRequest.getPassword());
 
+            //Checa se os dados são válidos
             Authentication authenticate = authenticationManager.authenticate(authentication);
 
             return authenticate;
@@ -53,6 +58,7 @@ public class UsernameAndPasswordAuthentication extends UsernamePasswordAuthentic
 
     }
 
+    //Executado se a chamada do método attemptAuthentication receber um resultado positivo
     @Override
     protected void successfulAuthentication(
         HttpServletRequest request,
@@ -60,17 +66,22 @@ public class UsernameAndPasswordAuthentication extends UsernamePasswordAuthentic
         FilterChain chain,
         Authentication authResult) throws IOException, ServletException {
         
+        //Cria o token
         String token = jwtUtil.generateToken(authResult, jwtConfig, secretKey);
         
+        //Anexa o token nos headers da resposta
         response.addHeader(jwtConfig.getAuthorizationHeaderName(), token);
     }
 
+
+    //Executado se a chamada do método attemptAuthentication receber um resultado negativo
     @Override
     protected void unsuccessfulAuthentication(
         HttpServletRequest request, 
         HttpServletResponse response,
         AuthenticationException failed) throws IOException, ServletException {
 
+        //Altera o status da resposta para 401
         response.setStatus(401);
     }
 
