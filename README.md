@@ -27,7 +27,7 @@ Usuário 02
 
 ## Parâmetros
 
-Para que a autenticação funcione corretamente é necessário passar 4 parâmetros para a aplicação, eles sendo:
+Para que a autenticação funcione corretamente é necessário passar 4 parâmetros para a aplicação no arquivo application.properties, eles sendo:
 
 - ``application.jwt.secret-key`` Chave secreta para assinatura dos tokens;
 
@@ -37,7 +37,7 @@ Para que a autenticação funcione corretamente é necessário passar 4 parâmet
 
 - ``application.jwt.authorization-header-name`` Nome do header que o endpoint /login utilizará para enviar o token.
 
-## End-points
+## Endpoints
 
 - ``POST`` /login - Responsável por gerar o token de autenticação para o usuário.
     - Requerido body na seguinte estrutura:
