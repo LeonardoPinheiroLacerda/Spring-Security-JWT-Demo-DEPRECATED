@@ -20,7 +20,9 @@ public class PingResource {
 
     @GetMapping
     public ResponseEntity<AppUser> ping(){
-        return ResponseEntity.ok(securityService.getAuthenticatedUser().get());
+        AppUser user = securityService.getAuthenticatedUser().get();
+        user.setPassword("Hoje não XD");
+        return ResponseEntity.ok(user);
     }
 
 }

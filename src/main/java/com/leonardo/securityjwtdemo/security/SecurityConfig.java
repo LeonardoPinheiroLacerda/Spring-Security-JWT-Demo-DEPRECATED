@@ -2,6 +2,7 @@ package com.leonardo.securityjwtdemo.security;
 
 import javax.crypto.SecretKey;
 
+import com.leonardo.securityjwtdemo.model.enums.Role;
 import com.leonardo.securityjwtdemo.repositories.UserRepository;
 import com.leonardo.securityjwtdemo.security.jwt.JwtConfig;
 import com.leonardo.securityjwtdemo.security.jwt.JwtUtil;
@@ -11,6 +12,7 @@ import com.leonardo.securityjwtdemo.security.users.AppUserDetailsService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -54,7 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
             .authorizeRequests()
             //.antMatchers("/h2-console/**").permitAll()
             
-            //.antMatchers(HttpMethod.GET, "/ping").hasRole(Role.ADMIN.name())
+            .antMatchers(HttpMethod.GET, "/ping").hasRole(Role.ADMIN.name())
             .anyRequest()
             .authenticated();
 
