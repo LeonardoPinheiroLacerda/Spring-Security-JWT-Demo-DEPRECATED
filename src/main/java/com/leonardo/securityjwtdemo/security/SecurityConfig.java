@@ -45,7 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
             .and()
 
             .addFilter(new UsernameAndPasswordAuthentication(authenticationManager(), jwtConfig, jwtUtil, secretKey))
-            .addFilterAfter(new TokenVerifier(jwtConfig, secretKey), UsernameAndPasswordAuthentication.class)
+            .addFilterAfter(new TokenVerifier(jwtConfig, secretKey, userDetailsService()), UsernameAndPasswordAuthentication.class)
             /*
             Permite acesso ao banco de dados H2
             Para uma aplicação de produção, deletar essa linha ou restringir para profiles de teste ou desenvolvimento

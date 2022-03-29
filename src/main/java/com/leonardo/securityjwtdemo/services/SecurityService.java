@@ -6,7 +6,6 @@ import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletResponse;
 
 import com.leonardo.securityjwtdemo.model.AppUser;
-import com.leonardo.securityjwtdemo.repositories.UserRepository;
 import com.leonardo.securityjwtdemo.security.jwt.JwtConfig;
 import com.leonardo.securityjwtdemo.security.jwt.JwtUtil;
 
@@ -20,14 +19,12 @@ import lombok.AllArgsConstructor;
 @Service
 public class SecurityService {
     
-    private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final JwtConfig jwtConfig;
     private final SecretKey secretKey;
        
     public Optional<AppUser> getAuthenticatedUser(){
-        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<AppUser> user = userRepository.findByUsername(username);
+        Optional<AppUser> user = Optional.of((AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         return user;
     }
 

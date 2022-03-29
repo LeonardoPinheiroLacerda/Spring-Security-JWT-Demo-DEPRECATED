@@ -13,12 +13,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.common.base.Strings;
+import com.leonardo.securityjwtdemo.model.AppUser;
 import com.leonardo.securityjwtdemo.security.jwt.JwtConfig;
+import com.leonardo.securityjwtdemo.security.users.AppUserDetails;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.Claims;
@@ -33,6 +36,7 @@ public class TokenVerifier extends OncePerRequestFilter {
    
     private final JwtConfig jwtConfig;
     private final SecretKey secretKey;
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, 
@@ -68,9 +72,13 @@ public class TokenVerifier extends OncePerRequestFilter {
                 .map(m -> new SimpleGrantedAuthority(m.get("authority")))
                 .collect(Collectors.toSet());
 
+            
+            AppUserDetails userDetails = (AppUserDetails) userDetailsService.loadUserByUsername(username);
+            AppUser user = userDetails.getUser();
+
             Authentication authentication = new UsernamePasswordAuthenticationToken(
-                username, 
-                null,
+                user, 
+                user.getPassword(),
                 simpleGrantedAuthorities
             );
 
