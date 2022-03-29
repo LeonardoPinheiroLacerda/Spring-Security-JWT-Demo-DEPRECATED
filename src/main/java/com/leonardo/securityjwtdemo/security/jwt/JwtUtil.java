@@ -27,7 +27,7 @@ public class JwtUtil {
             .setExpiration(Date.valueOf(LocalDate.now().plusDays(Integer.parseInt(jwtConfig.getTokenExpirationAfterDays()))))
             .signWith(secretKey)
             .compact();
-        return token;
+        return jwtConfig.getTokenPrefix() + token;
     }
 
     public String generateToken(AppUser user, JwtConfig jwtConfig, SecretKey secretKey){
@@ -45,7 +45,8 @@ public class JwtUtil {
             .setExpiration(Date.valueOf(LocalDate.now().plusDays(Integer.parseInt(jwtConfig.getTokenExpirationAfterDays()))))
             .signWith(secretKey)
             .compact();
-        return token;
+            
+        return jwtConfig.getTokenPrefix() + token;
     }
 
 }

@@ -62,7 +62,7 @@ public class UsernameAndPasswordAuthentication extends UsernamePasswordAuthentic
         
         String token = jwtUtil.generateToken(authResult, jwtConfig, secretKey);
         
-        response.addHeader("Authorization", jwtConfig.getTokenPrefix() + token);
+        response.addHeader(jwtConfig.getAuthorizationHeaderName(), token);
     }
 
     @Override
