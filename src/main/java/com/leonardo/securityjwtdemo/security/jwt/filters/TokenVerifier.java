@@ -25,18 +25,14 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import lombok.AllArgsConstructor;
 
-public class JwtTokenVerifier extends OncePerRequestFilter {
+@AllArgsConstructor
+
+public class TokenVerifier extends OncePerRequestFilter {
    
     private final JwtConfig jwtConfig;
     private final SecretKey secretKey;
-
-    public JwtTokenVerifier(JwtConfig jwtConfig,
-        SecretKey secretKey) {
-        
-        this.jwtConfig = jwtConfig;
-        this.secretKey = secretKey;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, 

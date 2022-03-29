@@ -2,16 +2,15 @@ package com.leonardo.securityjwtdemo.security;
 
 import javax.crypto.SecretKey;
 
-import com.leonardo.securityjwtdemo.model.enums.Role;
+import com.leonardo.securityjwtdemo.repositories.UserRepository;
 import com.leonardo.securityjwtdemo.security.jwt.JwtConfig;
 import com.leonardo.securityjwtdemo.security.jwt.JwtUtil;
-import com.leonardo.securityjwtdemo.security.jwt.filters.JwtTokenVerifier;
-import com.leonardo.securityjwtdemo.security.jwt.filters.JwtUsernameAndPasswordAuthenticationFilter;
+import com.leonardo.securityjwtdemo.security.jwt.filters.TokenVerifier;
+import com.leonardo.securityjwtdemo.security.jwt.filters.UsernameAndPasswordAuthentication;
 import com.leonardo.securityjwtdemo.security.users.AppUserDetailsService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -20,6 +19,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
@@ -27,15 +30,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     private final JwtConfig jwtConfig;
     private final JwtUtil jwtUtil;
     private final SecretKey secretKey;
-
-    public SecurityConfig(JwtConfig jwtConfig,
-        SecretKey secretKey,
-        JwtUtil jwtUtil) {
-        
-        this.jwtConfig = jwtConfig;
-        this.secretKey = secretKey;
-        this.jwtUtil = jwtUtil;
-    }
+    private final UserRepository userRepository;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -47,8 +42,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
             .and()
 
-            .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig, jwtUtil, secretKey))
-            .addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey), JwtUsernameAndPasswordAuthenticationFilter.class)
+            .addFilter(new UsernameAndPasswordAuthentication(authenticationManager(), jwtConfig, jwtUtil, secretKey))
+            .addFilterAfter(new TokenVerifier(jwtConfig, secretKey), UsernameAndPasswordAuthentication.class)
             /*
             Permite acesso ao banco de dados H2
             Para uma aplicação de produção, deletar essa linha ou restringir para profiles de teste ou desenvolvimento
@@ -58,7 +53,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         
             .authorizeRequests()
             //.antMatchers("/h2-console/**").permitAll()
-            .antMatchers(HttpMethod.GET, "/ping").hasRole(Role.ADMIN.name())
+            
+            //.antMatchers(HttpMethod.GET, "/ping").hasRole(Role.ADMIN.name())
             .anyRequest()
             .authenticated();
 
@@ -71,7 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
     @Override
     protected UserDetailsService userDetailsService() {
-        return new AppUserDetailsService();
+        return new AppUserDetailsService(userRepository);
     }
   
 }

@@ -19,24 +19,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
+
+public class UsernameAndPasswordAuthentication extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JwtConfig jwtConfig;
     private final JwtUtil jwtUtil;
     private final SecretKey secretKey;
-
-
-    public JwtUsernameAndPasswordAuthenticationFilter(AuthenticationManager authenticationManager,
-        JwtConfig jwtConfig,
-        JwtUtil jwtUtil,
-        SecretKey secretKey) {
-
-        this.authenticationManager = authenticationManager;
-        this.jwtConfig = jwtConfig;
-        this.jwtUtil = jwtUtil;
-        this.secretKey = secretKey;
-    }
 
     @Override
     public Authentication attemptAuthentication(
@@ -74,8 +66,11 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
     }
 
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-            AuthenticationException failed) throws IOException, ServletException {
+    protected void unsuccessfulAuthentication(
+        HttpServletRequest request, 
+        HttpServletResponse response,
+        AuthenticationException failed) throws IOException, ServletException {
+
         response.setStatus(401);
     }
 
