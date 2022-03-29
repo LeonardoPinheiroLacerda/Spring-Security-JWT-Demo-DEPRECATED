@@ -4,6 +4,13 @@ Um exemplo de autenticação e autorização utilizando JWT, para utilizar como 
 
 Esta aplicação conta com um banco de dados em memória H2 para armazenamento temporário dos usuários, onde um novo banco é instanciado em cada execução, o banco pode ser acesso no endpoint /h2-console.
 
+Acessando o endpoint /h2-console em um navegador, irá abrir um formulário para você inserir as credênciais do banco, que são as que seguem:
+
+- **Driver Class:** org.h2.Driver
+- **JDBC URL:** jdbc:h2:mem:testdb
+- **User name:** sa
+- **Password:** (Por se tratar de um banco de teste, não tem senha.)
+
 ## Usuários
 
 Usuário 01
